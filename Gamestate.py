@@ -1,117 +1,103 @@
-from enum import Enum
 import random
 import math
+import pygame as py
 
 
 class Gamestate:
-    def __init__(self):
-        self.board = [[0, 0, 0, 0],
-                      [0, 0, 0, 0],
-                      [0, 0, 0, 0],
-                      [0, 0, 0, 0]]
+    def __init__(self, rows: int):
+        self.size = rows
+        self.tiles = [0] * rows ** 2
 
-        rand_num_1 = random.random()
-        rand_num_2 = random.random()
-        if rand_num_1 > 0.99:
-            initial_number_1 = 8
-        elif rand_num_1 > 0.9:
-            initial_number_1 = 4
-        else:
-            initial_number_1 = 2
+        self.addTile()
+        self.addTile()
 
-        if rand_num_2 > 0.99:
-            initial_number_2 = 8
-        elif rand_num_2 > 0.9:
-            initial_number_2 = 4
-        else:
-            initial_number_2 = 2
+    def shiftTiles(self, direction: int):
+        if direction in (py.K_UP, py.K_DOWN):
+            self.transposeTiles()
 
-        square_1 = math.floor(random.random() * 16)
-        square_2 = math.floor(random.random() * 16)
-        while square_2 == square_1:
-            square_2 = math.floor(random.random() * 16)
+        if direction in (py.K_RIGHT, py.K_DOWN):
+            self.mirrorTiles()
 
-        self.board[square_1 % 4][square_1 // 4] = initial_number_1
-        self.board[square_2 % 4][square_2 // 4] = initial_number_2
+        rows = [self.tiles[row_start:row_start + self.size] for row_start in range(0, self.size ** 2, self.size)]
 
-    def MakeMove(self, direction: str):
-        if direction == 'right':
-            for row in self.board:
-                for tile in range(3, -1, -1):
-                    if tile == 3 or row[tile] == 0: continue
+        for row_num in range(self.size):
+            row = rows[row_num]
+            for tile in range(1, self.size):
+                degree = row[tile]
+                if degree == 0: continue
 
-                    for index in range(tile + 1, 4):
-                        if index == 4:
-                            break
+                for destination in range(tile, -1, -1):
+                    if destination == 0:
+                        row[destination] = degree
+                        row[tile] = 0
+                        break
 
-                        if row[index] == row[tile]:
-                            row[index] *= 2
-                            row[tile] = 0
-                            break
+                    if row[destination - 1] == 0:
+                        continue
 
-                        elif row[index] != 0:
-                            row[index - 1] = row[tile]
-                            if index != tile + 1: row[tile] = 0
-                            break
+                    if row[destination - 1] == degree:
+                        row[destination - 1] += 1
+                        row[tile] = 0
+                        break
 
-                        elif index == 3:
-                            row[index] = row[tile]
-                            row[tile] = 0
-                            break
+                    row[tile] = 0
+                    row[destination] = degree
+                    break
 
-            rand_num = random.random()
-            if rand_num > 0.99:
-                number = 8
-            elif rand_num > 0.9:
-                number = 4
-            else:
-                number = 2
+            self.tiles[row_num * self.size:(row_num + 1) * self.size] = row
 
-            square = math.floor(random.random() * 16)
-            while self.board[square % 4][square // 4] > 0:
-                square = math.floor(random.random() * 16)
+        if direction in (py.K_RIGHT, py.K_DOWN):
+            self.mirrorTiles()
 
-            self.board[square % 4][square // 4] = number
+        if direction in (py.K_UP, py.K_DOWN):
+            self.transposeTiles()
 
-        elif direction == 'left':
-            for row in self.board:
-                row.reverse()
+        self.addTile()
 
-            self.MakeMove('right')
+    def addTile(self):
+        if self.tiles.count(0) == 0: return
 
-            for row in self.board:
-                row.reverse()
+        tile = math.floor(random.random() * self.size ** 2)
+        while self.tiles[tile] != 0:
+            tile = math.floor(random.random() * self.size ** 2)
 
-        elif direction == 'up':
-            self.board = Transpose(self.board)
-            self.MakeMove('left')
-            self.board = Transpose(self.board)
+        degree = min(math.floor(-math.log10(random.random())), 4) + 1
 
-        elif direction == 'down':
-            self.board = Transpose(self.board)
-            self.MakeMove('right')
-            self.board = Transpose(self.board)
+        self.tiles[tile] = degree
 
-    def GameOver(self):
-        board = self.board[0] + self.board[1] + self.board[2] + self.board[3]
-        if board.count(0) > 0: return False
+    def transposeTiles(self):
+        transposed = [0] * self.size ** 2
 
-        for row in self.board:
-            for index in range(3):
-                if row[index] == row[index + 1]: return False
+        for tile in range(self.size ** 2):
+            row = tile // self.size
+            col = tile % self.size
 
-        board = Transpose(self.board)
-        for row in board:
-            for index in range(3):
-                if row[index] == row[index + 1]: return False
+            transposed[tile] = self.tiles[self.size * col + row]
+
+        self.tiles = transposed
+
+    def mirrorTiles(self):
+        mirrored = []
+
+        for row_number in range(self.size):
+            row = self.tiles[row_number * self.size: (row_number + 1) * self.size]
+            mirrored_row = row[::-1]  # Reverse the row to mirror it
+            mirrored.extend(mirrored_row)
+
+        self.tiles = mirrored
+
+    def gameOver(self) -> bool:
+        if self.tiles.count(0) > 0: return False
+
+        rows = [self.tiles[row_start:row_start + self.size] for row_start in range(0, self.size ** 2, self.size)]
+        self.transposeTiles()
+        cols = [self.tiles[col_start:col_start + self.size] for col_start in range(0, self.size ** 2, self.size)]
+        self.transposeTiles()
+
+        for row in range(self.size):
+            for tile in range(self.size - 1):
+                if rows[row][tile] == rows[row][tile + 1]: return False
+                if cols[row][tile] == cols[row][tile + 1]: return False
 
         return True
 
-def Transpose(matrix):
-    transposed = [[0] * 4 for _ in range(4)]
-
-    for i in range(4):
-        for j in range(4):
-            transposed[i][j] = matrix[j][i]
-
-    return transposed
