@@ -1,8 +1,10 @@
 import Gamestate
 import pygame as py
 import math
+import Button
 
 
+start_button = Button.Button(200, 200, 200, 200, "Start!")
 square_colors = {
     0: py.Color(40, 42, 58, 255),
     1: py.Color(250, 230, 85, 255),
@@ -50,3 +52,10 @@ class GUI:
             d_rect = py.Rect(centerX, centerY, self.square_size, self.square_size)
             py.draw.rect(self.window, color, d_rect)
             self.window.blit(text, text.get_rect(center=d_rect.center))
+
+    def drawStartScreen(self):
+        text = self.font.render("2048", self.screen_size // 2, self.screen_size // 2 - 40)
+        d_rect = py.Rect(0, 0, self.screen_size, self.screen_size)
+        self.window.blit(text, text.get_rect(center=d_rect.center))
+        start_button.draw(self.window)
+

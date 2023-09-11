@@ -1,12 +1,12 @@
 import pygame as py
 import Gamestate
-import GUI
+from GUI import Gui
 
 
 def main():
     py.init()
     gamestate = Gamestate.Gamestate(4)
-    gui = GUI.GUI(gamestate.size)
+    gui = Gui.GUI(4)
 
     clock = py.time.Clock()
     timer = py.time.get_ticks()
@@ -23,11 +23,12 @@ def main():
                 gamestate.shiftTiles(event.key)
 
 
-        gui.DrawGame(gamestate)
+        #gui.DrawGame(gamestate)
+        gui.drawStartScreen()
         py.display.flip()
         clock.tick(60)
 
-        if py.time.get_ticks() - timer > 1000:
+        if py.time.get_ticks() - timer > 500:
             timer = py.time.get_ticks()
             gamestate.addTile()
 
