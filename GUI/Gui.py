@@ -1,8 +1,7 @@
 import Gamestate
 import pygame as py
 import math
-import Button
-
+from GUI import Button
 
 start_button = Button.Button(200, 200, 200, 200, "Start!")
 square_colors = {
