@@ -4,22 +4,22 @@ import math
 from GUI import Button
 
 start_button = Button.Button(200, 200, 200, 200, "Start!")
-square_colors = {
-    0: py.Color(40, 42, 58, 255),
-    1: py.Color(250, 230, 85, 255),
-    2: py.Color(214, 223, 78, 255),
-    3: py.Color(177, 216, 85, 255),
-    4: py.Color(143, 205, 99, 255),
-    5: py.Color(115, 193, 114, 255),
-    6: py.Color(94, 179, 126, 255),
-    7: py.Color(80, 165, 134, 255),
-    8: py.Color(72, 150, 139, 255),
-    9: py.Color(67, 230, 85, 255),
-    10: py.Color(64, 119, 139, 255),
-    11: py.Color(62, 104, 138, 255),
-    12: py.Color(62, 87, 136, 255),
-    13: py.Color(65, 70, 130, 255),
-}
+square_colors = [
+    py.Color(40, 42, 58, 255),
+    py.Color(250, 230, 85, 255),
+    py.Color(214, 223, 78, 255),
+    py.Color(177, 216, 85, 255),
+    py.Color(143, 205, 99, 255),
+    py.Color(115, 193, 114, 255),
+    py.Color(94, 179, 126, 255),
+    py.Color(80, 165, 134, 255),
+    py.Color(72, 150, 139, 255),
+    py.Color(67, 130, 85, 255),
+    py.Color(64, 119, 139, 255),
+    py.Color(62, 104, 138, 255),
+    py.Color(62, 87, 136, 255),
+    py.Color(65, 70, 130, 255),
+]
 
 
 class GUI:
@@ -46,7 +46,7 @@ class GUI:
             if degree > 0:
                 text = self.font.render(str(2 ** degree), True, py.Color(0, 0, 0, 255), None)
             else:
-                text  = self.font.render('', True, py.Color(0, 0, 0, 255), None)
+                text = self.font.render('', True, py.Color(0, 0, 0, 255), None)
 
             d_rect = py.Rect(centerX, centerY, self.square_size, self.square_size)
             py.draw.rect(self.window, color, d_rect)

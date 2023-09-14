@@ -12,6 +12,8 @@ class Gamestate:
         self.addTile()
 
     def shiftTiles(self, direction: int):
+        copy = self.tiles
+
         if direction in (py.K_UP, py.K_DOWN):
             self.transposeTiles()
 
@@ -52,7 +54,8 @@ class Gamestate:
         if direction in (py.K_UP, py.K_DOWN):
             self.transposeTiles()
 
-        self.addTile()
+        if not self.tiles != copy:
+            self.addTile()
 
     def addTile(self):
         if self.tiles.count(0) == 0: return
